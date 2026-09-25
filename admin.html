@@ -5,14 +5,15 @@
   <title>Administration produits | Nana Store</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body{background:#faf7f4}.admin{max-width:1100px;margin:40px auto;padding:0 20px}
+    *{box-sizing:border-box}body{background:#faf7f4;margin:0}.admin{max-width:1100px;margin:0 auto;padding:24px 20px 48px}
     .panel{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 30px #35251b12;margin:20px 0}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.wide{grid-column:1/-1}
-    label{display:grid;gap:6px;font-weight:600}input,textarea,select{padding:11px;border:1px solid #ddd;border-radius:8px;font:inherit}
+    label{display:grid;gap:6px;font-weight:600}input,textarea,select{width:100%;min-width:0;padding:11px;border:1px solid #ddd;border-radius:8px;font:inherit}input[type="checkbox"]{width:auto}
     table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid #eee}td img{width:48px;height:48px;object-fit:cover;border-radius:6px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}.error{color:#b42318}.hidden{display:none}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.actions .button,.actions button{min-height:42px}.error{color:#b42318}.hidden{display:none}
     .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}.image-card{border:1px solid #eee;border-radius:10px;padding:8px;background:#fff}.image-card.selected{border:2px solid #9b6b43}.image-card img{width:100%;height:105px;object-fit:cover;border-radius:6px}.image-card button{width:100%;margin-top:6px}
-    @media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}table{font-size:13px}}
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}button,input,textarea,select{max-width:100%}
+    @media(max-width:700px){.admin{padding:16px 12px 32px}.panel{padding:16px;margin:14px 0;border-radius:12px}.admin h1{font-size:1.65rem}.admin h2{font-size:1.2rem}.grid{grid-template-columns:1fr}.wide{grid-column:auto}.actions>*{flex:1 1 100%}.actions input[type="file"]{padding:8px}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.image-card img{height:120px}table{font-size:12px;min-width:680px}th,td{padding:8px}}
   </style>
 </head>
 <body>
@@ -41,10 +42,11 @@
           <label>Tailles (séparées par virgule)<input name="tailles"></label><label><span>Nouveau</span><input name="nouveau" type="checkbox"></label>
         </div><div class="actions"><button class="button button-primary" type="submit">Enregistrer</button><button class="button button-outline" id="cancel" type="button">Annuler</button></div><p id="form-error" class="error"></p>
       </form>
-      <section class="panel"><h2>Catalogue</h2><div style="overflow:auto"><table><thead><tr><th>Image</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Disponibilité</th><th></th></tr></thead><tbody id="products"></tbody></table></div></section>
+      <section class="panel"><h2>Catalogue</h2><div class="table-wrap"><table><thead><tr><th>Image</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Disponibilité</th><th></th></tr></thead><tbody id="products"></tbody></table></div></section>
     </section>
   </main>
   <script>
+    if (window.top !== window.self) window.top.location.href = window.location.href;
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec";
     // Remplacez ces deux placeholders par les valeurs de Cloudinary (aucune clé secrète ici).
     const CLOUDINARY_CLOUD_NAME = "hzprzsvw";
