@@ -1,0 +1,66 @@
+[
+  {
+    "id": "prod-acc-01",
+    "nom": "Montre Chrono Dorée & Cuir Noir",
+    "categorie": "accessoires",
+    "prix": 28000,
+    "description": "Boîtier ultra-plat en acier inoxydable doré, cadran soleillé minimaliste et bracelet en cuir noir texturé.",
+    "image": "images/product_gold_watch.jpg",
+    "disponibilite": "en_stock"
+  },
+  {
+    "id": "prod-acc-02",
+    "nom": "Créoles Sculptées Or 18K",
+    "categorie": "accessoires",
+    "prix": 15000,
+    "description": "Paire de boucles d'oreilles créoles aux reflets organiques martelés à la main. Plaquage or haute tenue résistant au quotidien.",
+    "image": "images/product_gold_earrings.jpg",
+    "disponibilite": "en_stock"
+  },
+  {
+    "id": "prod-acc-03",
+    "nom": "Portefeuille Cuir Ébène",
+    "categorie": "accessoires",
+    "prix": 12500,
+    "description": "Portefeuille compact en cuir véritable embossé avec fentes multiples cartes et compartiment billets.",
+    "image": "images/product_leather_bag.jpg",
+    "disponibilite": "en_stock"
+  },
+  {
+    "id": "prod-parfums-01",
+    "nom": "Collection Parfums Rares",
+    "categorie": "parfums",
+    "prix": 0,
+    "description": "Notre sélection exclusive d'extraits de parfum purs, de brumes envoûtantes et de sillages précieux arrive très prochainement.",
+    "image": "images/product_perfume_amber.jpg",
+    "disponibilite": "a_venir"
+  },
+  {
+    "id": "prod-vetements-01",
+    "nom": "Collection Vêtements & Prêt-à-Porter",
+    "categorie": "vetements",
+    "prix": 0,
+    "description": "Nouvelle ligne de robes soyeuses, chemises en lin noble et ensembles fluides en cours d'arrivage.",
+    "image": "images/product_silk_dress.jpg",
+    "disponibilite": "a_venir"
+  },
+  {
+    "id": "prod-sac-01",
+    "nom": "Collection Sacs & Maroquinerie",
+    "categorie": "sac",
+    "prix": 0,
+    "description": "Sacs à main en cuir pleine fleur, pochettes de soirée et maroquinerie d'exception en cours d'arrivage.",
+    "image": "images/product_leather_bag.jpg",
+    "disponibilite": "a_venir"
+  },
+  {
+    "id": "prod-chaussures-01",
+    "nom": "Mocassins Cuir Italien Prestige",
+    "categorie": "chaussures",
+    "prix": 42000,
+    "description": "Mocassins d'une grande distinction façonnés en cuir véritable souple avec semelle cousue main. Confort et prestige.",
+    "image": "images/product_luxury_shoes.jpg",
+    "disponibilite": "en_stock",
+    "tailles": ["40", "41", "42", "43", "44", "45"]
+  }
+]

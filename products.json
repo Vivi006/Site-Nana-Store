@@ -1,0 +1,14 @@
+[
+  {"id":"acc-01","nom":"Créoles Soleil","categorie":"accessoires","prix":8500,"description":"Des créoles dorées légères, parfaites pour illuminer vos looks du quotidien.","image":"images/product_gold_earrings.jpg","disponibilite":"en_stock","nouveau":true},
+  {"id":"acc-02","nom":"Montre Élégance","categorie":"accessoires","prix":28000,"description":"Une montre dorée au bracelet en cuir noir, chic et facile à porter.","image":"images/product_gold_watch.jpg","disponibilite":"en_stock"},
+  {"id":"acc-03","nom":"Sac Mini Aura","categorie":"accessoires","prix":22500,"description":"Un mini sac structuré pour emporter l'essentiel avec style.","image":"images/product_leather_bag.jpg","disponibilite":"en_stock"},
+  {"id":"acc-04","nom":"Lunettes Solaires Pop","categorie":"accessoires","prix":12000,"description":"Des lunettes tendance avec une monture douce et féminine.","image":"images/product_gold_watch.jpg","disponibilite":"en_stock","nouveau":true},
+  {"id":"par-01","nom":"Parfum Ambre Doux","categorie":"parfums","prix":18500,"description":"Un sillage chaleureux aux notes d'ambre, vanille et musc blanc.","image":"images/product_perfume_amber.jpg","disponibilite":"en_stock","nouveau":true},
+  {"id":"par-02","nom":"Brume Fleur d'Ivoire","categorie":"parfums","prix":10000,"description":"Une brume fraîche et délicate à glisser dans votre sac.","image":"images/product_oud_fragrance.jpg","disponibilite":"en_stock"},
+  {"id":"par-03","nom":"Eau de parfum Oud Chic","categorie":"parfums","prix":24000,"description":"Un parfum intense et élégant pour les grandes occasions.","image":"images/product_oud_fragrance.jpg","disponibilite":"epuise"},
+  {"id":"vet-01","nom":"Robe Satin Rosée","categorie":"vetements","prix":32000,"description":"Une robe fluide au tombé satiné, idéale pour vos sorties.","image":"images/product_silk_dress.jpg","disponibilite":"en_stock","tailles":["S","M","L"],"nouveau":true},
+  {"id":"vet-02","nom":"Chemise Lin Nuage","categorie":"vetements","prix":26000,"description":"Une chemise en lin légère et respirante pour Abidjan.","image":"images/product_linen_shirt.jpg","disponibilite":"en_stock","tailles":["S","M","L","XL"]},
+  {"id":"vet-03","nom":"Mocassins Signature","categorie":"vetements","prix":42000,"description":"Des mocassins en cuir souple, confortables du matin au soir.","image":"images/product_luxury_shoes.jpg","disponibilite":"en_stock","tailles":["38","39","40","41","42"]},
+  {"id":"aut-01","nom":"Pochette Soirée Lune","categorie":"autres","prix":14500,"description":"La petite pochette brillante qui accompagne vos soirées.","image":"images/product_leather_bag.jpg","disponibilite":"en_stock"},
+  {"id":"aut-02","nom":"Coffret Self-care","categorie":"autres","prix":16000,"description":"Un joli coffret à offrir ou à s'offrir pour un moment rien qu'à soi.","image":"images/product_perfume_amber.jpg","disponibilite":"en_stock","nouveau":true}
+]

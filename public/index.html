@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maison AURA — Boutique en Ligne Abidjan</title>
+  <meta name="description" content="Boutique en ligne moderne de mode, parfums et accessoires à Abidjan (Côte d'Ivoire). Commandes en ligne simples via WhatsApp et livraison rapide à domicile." />
+  
+  <!-- Balises OpenGraph pour partage WhatsApp, Facebook & Instagram -->
+  <meta property="og:title" content="Maison AURA — Boutique en Ligne Abidjan" />
+  <meta property="og:description" content="Boutique en ligne d'accessoires, parfums rares et vêtements élégants. Livraison express à domicile à Abidjan & expéditions en Côte d'Ivoire." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="images/hero_boutique.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts : Playfair Display (Titres luxueux) + Plus Jakarta Sans (Corps lisible) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Feuille de styles principale -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       FORMULAIRE STATIQUE CACHÉ POUR DÉTECTION PAR NETLIFY FORMS AU DÉPLOIEMENT
+       (Exigence stricte de Netlify pour enregistrer le formulaire sans backend)
+       ======================================================================== -->
+  <form name="commande" netlify data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="hidden" name="form-name" value="commande" />
+    <input type="text" name="bot-field" />
+    <input type="text" name="nom" />
+    <input type="tel" name="telephone" />
+    <input type="email" name="email" />
+    <input type="text" name="commune" />
+    <input type="text" name="adresse" />
+    <input type="text" name="paiement" />
+    <textarea name="note"></textarea>
+    <input type="hidden" name="recapitulatif_commande" />
+    <input type="hidden" name="total" />
+  </form>
+
+  <!-- --- 1. Barre d'Annonce Supérieure --- -->
+  <div class="top-announcement">
+    Boutique en ligne · Livraison express à domicile à Abidjan sous 24h · Paiement à la réception ou <span>Mobile Money (Wave / Orange)</span>
+  </div>
+
+  <!-- --- 2. En-tête / Navigation (Contrat 3 Zones) --- -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- Zone 1 : Marque (Lien texte épuré) -->
+      <a href="#accueil" class="brand-title" onclick="navigateToPage('home'); return false;">
+        Maison <span>AURA</span>
+      </a>
+
+      <!-- Zone 2 : Liens de navigation principaux -->
+      <nav class="main-nav" aria-label="Navigation principale">
+        <a href="#accueil" class="nav-link active" id="navLinkHome" onclick="navigateToPage('home'); return false;">Accueil</a>
+        <a href="#articles" class="nav-link" id="navLinkArticles" onclick="navigateToPage('articles'); return false;">Boutique & Articles</a>
+        <a href="#apropos" class="nav-link" onclick="navigateToSection('apropos'); return false;">À propos</a>
+        <a href="#livraison" class="nav-link" onclick="navigateToSection('livraison'); return false;">Livraison & Paiement</a>
+        <a href="#contact" class="nav-link" onclick="navigateToSection('contact'); return false;">Contact</a>
+      </nav>
+
+      <!-- Zone 3 : Actions droite (Panier & Menu Mobile) -->
+      <div class="header-actions">
+        <!-- Bouton Panier avec compteur dynamique -->
+        <button 
+          type="button" 
+          class="action-btn" 
+          onclick="openCartDrawer()" 
+          aria-label="Ouvrir le panier"
+          title="Mon Panier"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="cart-badge" id="headerCartBadge">0</span>
+        </button>
+
+        <!-- Bouton Menu Mobile (Hamburger) -->
+        <button 
+          type="button" 
+          class="menu-toggle-btn" 
+          id="mobileMenuToggle" 
+          aria-label="Menu"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Menu Déroulant Mobile -->
+    <div class="mobile-nav-panel" id="mobileNavPanel">
+      <div class="mobile-nav-links">
+        <a href="#accueil" class="mobile-nav-link" onclick="navigateToPage('home'); return false;">Accueil</a>
+        <a href="#articles" class="mobile-nav-link" onclick="navigateToPage('articles'); return false;">Boutique & Articles</a>
+        <a href="#apropos" class="mobile-nav-link" onclick="navigateToSection('apropos'); return false;">Notre Histoire</a>
+        <a href="#livraison" class="mobile-nav-link" onclick="navigateToSection('livraison'); return false;">Livraison & Modes de Paiement</a>
+        <a href="#contact" class="mobile-nav-link" onclick="navigateToSection('contact'); return false;">Nous contacter</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============================================== -->
+    <!-- 1. VUE / PAGE D'ACCUEIL (Présentation & Marque) -->
+    <!-- ============================================== -->
+    <div id="page-home" class="site-page">
+      <!-- --- 3. Section Hero (Accueil) --- -->
+      <section class="hero-section">
+        <div class="container">
+          <div class="hero-grid">
+            <div class="hero-content">
+              <span class="hero-tag">Boutique en Ligne · Abidjan</span>
+              <h1 class="hero-title">L'art du raffinement, de la mode & des parfums</h1>
+              <p class="hero-description">
+                Sélection exclusive d'accessoires de prestige, d'extraits de parfum envoûtants et de vêtements raffinés. Commandez directement en ligne et faites-vous livrer chez vous en toute sérénité.
+              </p>
+              <div class="hero-actions">
+                <button type="button" class="btn-primary" onclick="navigateToPage('articles')">
+                  Accéder aux articles
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+                <a 
+                  href="https://wa.me/2250701020304?text=Bonjour%20Maison%20AURA,%20je%20souhaite%20vous%20contacter." 
+                  target="_blank" 
+                  rel="noopener" 
+                  class="btn-whatsapp-hero"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/>
+                  </svg>
+                  Nous contacter sur WhatsApp
+                </a>
+              </div>
+            </div>
+
+          <div class="hero-visual">
+            <div class="hero-image-wrapper">
+              <img 
+                src="images/hero_boutique.jpg" 
+                alt="Ambiance luxueuse et épurée de la boutique Maison AURA à Abidjan" 
+                loading="eager"
+              />
+            </div>
+            <div class="hero-card-floating">
+              <div class="card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+              <div>
+                <div class="card-title">Boutique en Ligne · Accessible 24/7</div>
+                <div class="card-sub">Livraison express à domicile à Abidjan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- 4. Section À Propos --- -->
+    <section class="about-section" id="apropos">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-content">
+            <span class="section-kicker">Notre Histoire</span>
+            <h2>Une passion commune pour l'élégance intemporelle</h2>
+            <p>
+              Maison AURA est née de notre désir partagé de proposer aux amoureux de style à Abidjan des pièces qui allient distinction, confort et durabilité. Chaque parfum, chaque vêtement et chaque accessoire est sélectionné avec une rigueur absolue.
+            </p>
+            <p>
+              En tant que boutique exclusivement en ligne, nous vous offrons une expérience fluide, rapide et sécurisée. Commandez en toute liberté depuis votre smartphone ou ordinateur et recevez vos pièces directement chez vous ou à votre lieu de travail.
+            </p>
+
+            <div class="about-pillars">
+              <div class="pillar-item">
+                <h4>✨ Matières Nobles</h4>
+                <p>Soie naturelle, pur lin, cuir pleine fleur et concentrés d'essences de haute parfumerie.</p>
+              </div>
+              <div class="pillar-item">
+                <h4>⚡ Service Attentionné</h4>
+                <p>Conseils personnalisés sur WhatsApp, suivi de commande et conciergerie locale.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-image-wrapper">
+            <img 
+              src="images/product_perfume_amber.jpg" 
+              alt="Flacon d'extrait de parfum et matières nobles" 
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- 6. Section Livraison & Partenaire Ivoire Livraison --- -->
+    <section class="delivery-section" id="livraison">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">Réseau & Partenaire Express</div>
+          <h2 class="section-title">Livraison Sécurisée avec Ivoire Livraison</h2>
+          <p class="section-description">
+            Vos colis sont pris en charge avec le plus grand soin via le réseau mobile <strong>Ivoire Livraison</strong> et nos coursiers accrédités pour une expédition fluide, suivie et garantie.
+          </p>
+        </div>
+
+        <div class="services-grid">
+          <!-- Carte 1 : Ivoire Livraison Express Abidjan -->
+          <div class="service-card">
+            <div class="service-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            </div>
+            <div class="service-tag-ivoire">Partenaire Officiel</div>
+            <h3>Ivoire Livraison — Abidjan</h3>
+            <p>Attribution instantanée d'un coursier géolocalisé via l'application mobile pour une remise en mains propres en 24h.</p>
+            <ul class="service-list">
+              <li><strong>Zone 1 (1 500 F) :</strong> Cocody, Plateau, Marcory, Zone 4</li>
+              <li><strong>Zone 2 (2 000 F) :</strong> Yopougon, Treichville, Koumassi</li>
+              <li><strong>Zone 3 (2 500 F) :</strong> Abobo, Port-Bouët, Bingerville</li>
+              <li>Appel du coursier 15 min avant arrivée</li>
+            </ul>
+          </div>
+
+          <!-- Carte 2 : Express Urgence Jour Même -->
+          <div class="service-card">
+            <div class="service-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div class="service-tag-ivoire">Prioritaire</div>
+            <h3>Course Flash Même Jour</h3>
+            <p>Une urgence pour une soirée, un cadeau ou un événement ? Livraison accélérée le jour même sur créneau dédié.</p>
+            <ul class="service-list">
+              <li>Disponible pour commandes avant 13h00</li>
+              <li>Coursier moto prioritaire Ivoire Livraison</li>
+              <li>Tarif forfaitaire : 3 000 FCFA</li>
+              <li>Colis scellé et manipulation soignée</li>
+            </ul>
+          </div>
+
+          <!-- Carte 3 : Expéditions Intérieur & Modalités -->
+          <div class="service-card">
+            <div class="service-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <div class="service-tag-ivoire">National</div>
+            <h3>Intérieur & Paiements</h3>
+            <p>Expéditions régulières en gares routières agrées ou agences relais avec avis de dépôt instantané.</p>
+            <ul class="service-list">
+              <li>Grand-Bassam (2 500 F) · Intérieur (3 500 F)</li>
+              <li>Yamoussoukro, Bouaké, San Pedro, Daloa</li>
+              <li>Paiement à la livraison ou Wave sans frais</li>
+              <li>Bordereau envoyé par WhatsApp dès le dépôt</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- 7. Section Contact --- -->
+    <section class="contact-section" id="contact">
+      <div class="container">
+        <div class="contact-grid">
+          <div>
+            <span class="section-kicker">Échangeons Ensemble</span>
+            <h2 class="section-title">Besoin d'un conseil ou d'une commande sur-mesure ?</h2>
+            <p class="section-description">
+              Notre équipe est à votre entière disposition pour répondre à toutes vos questions, vous orienter dans le choix d'un parfum ou vérifier la disponibilité d'une taille.
+            </p>
+
+            <div class="contact-info-list">
+              <div class="contact-channel-item">
+                <div class="contact-channel-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="channel-label">WhatsApp Direct</div>
+                  <a href="https://wa.me/2250701020304" target="_blank" rel="noopener" class="channel-val">
+                    +225 07 01 02 03 04
+                  </a>
+                </div>
+              </div>
+
+              <div class="contact-channel-item">
+                <div class="contact-channel-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                </div>
+                <div>
+                  <div class="channel-label">Instagram</div>
+                  <a href="https://instagram.com" target="_blank" rel="noopener" class="channel-val">
+                    @maison_aura_abidjan
+                  </a>
+                </div>
+              </div>
+
+              <div class="contact-channel-item">
+                <div class="contact-channel-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <div class="channel-label">Courrier Électronique</div>
+                  <a href="mailto:contact@maisonaura-abidjan.ci" class="channel-val">
+                    contact@maisonaura-abidjan.ci
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 2. VUE / PAGE DÉDIÉE AUX ARTICLES (Boutique)   -->
+  <!-- ============================================== -->
+  <div id="page-articles" class="site-page hidden">
+    <section class="shop-section" id="catalogue">
+      <div class="container">
+        <!-- Bouton Retour à l'Accueil & Fil d'Ariane -->
+        <div class="articles-breadcrumbs">
+          <button type="button" class="btn-back-home" onclick="navigateToPage('home')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            ← Retour à l'accueil
+          </button>
+        </div>
+
+        <div class="section-header">
+          <div class="section-kicker">Boutique & Catalogue</div>
+          <h2 class="section-title">Nos Collections & Articles</h2>
+          <p class="section-description">
+            Parcourez nos accessoires, parfums d'exception, sacs, souliers et vêtements coupés dans des matières d'une grande noblesse.
+          </p>
+        </div>
+
+        <!-- Contrôles : Filtres par catégorie, Recherche & Tri -->
+        <div class="catalog-controls">
+          <!-- Filtres par catégorie (Boutons segmentés discrets) -->
+          <div class="category-filters" role="tablist" aria-label="Catégories de produits">
+            <button type="button" class="filter-btn active" data-category="tous">Tous</button>
+            <button type="button" class="filter-btn" data-category="accessoires">Accessoires</button>
+            <button type="button" class="filter-btn" data-category="parfums">Parfums</button>
+            <button type="button" class="filter-btn" data-category="vetements">Vêtements</button>
+            <button type="button" class="filter-btn" data-category="sac">Sac</button>
+            <button type="button" class="filter-btn" data-category="chaussures">Chaussures</button>
+          </div>
+
+          <!-- Outils de recherche et de tri -->
+          <div class="search-sort-group">
+            <div class="search-input-wrapper">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Rechercher un produit..." 
+                aria-label="Rechercher un produit"
+              />
+            </div>
+
+            <select id="sortSelect" class="sort-select" aria-label="Trier les produits">
+              <option value="default">Tri par défaut</option>
+              <option value="price-asc">Prix croissant</option>
+              <option value="price-desc">Prix décroissant</option>
+              <option value="name-asc">Nom (A à Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Compteur d'articles trouvés -->
+        <div class="catalog-status-bar">
+          <span id="catalogResultCount">Articles disponibles</span>
+          <span style="font-size: 0.8rem; color: var(--text-light);">Prix nets en FCFA</span>
+        </div>
+
+        <!-- Grille de Produits (générée dynamiquement en JavaScript) -->
+        <div class="products-grid" id="productsGrid">
+          <!-- Les cartes produits s'injectent ici automatiquement depuis products.json -->
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+  <!-- --- 8. Modale Fiche Produit Détaillée (Quick View) --- -->
+  <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-container">
+      <button type="button" class="modal-close-btn" onclick="closeProductModal()" aria-label="Fermer la fiche produit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="product-modal-grid">
+        <div class="product-modal-image">
+          <img id="modalImg" src="" alt="" />
+        </div>
+        <div class="product-modal-details">
+          <div class="modal-meta" id="modalCategory">Catégorie</div>
+          <h2 class="modal-title" id="modalTitle">Nom du produit</h2>
+          <div class="modal-price tabular-nums" id="modalPrice">0 FCFA</div>
+          <p class="modal-description" id="modalDescription">Description complète du produit...</p>
+
+          <!-- Conteneur sélection de taille (affiché dynamiquement pour les vêtements) -->
+          <div id="modalSizeContainer" class="size-selector-group"></div>
+
+          <!-- Sélecteur de quantité & Ajout Panier -->
+          <div class="modal-actions">
+            <div class="quantity-control">
+              <button type="button" class="qty-btn" onclick="changeModalQty(-1)" aria-label="Diminuer la quantité">-</button>
+              <span class="qty-val" id="modalQtyVal">0</span>
+              <button type="button" class="qty-btn" onclick="changeModalQty(1)" aria-label="Augmenter la quantité">+</button>
+            </div>
+            <button type="button" id="modalAddBtn" class="btn-primary btn-modal-add" onclick="handleModalAddToCart()" disabled style="opacity: 0.6; cursor: not-allowed;">
+              Sélectionnez une quantité (+)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- 9. Tiroir Coulissant Panier (Cart Drawer) --- -->
+  <div class="cart-drawer-backdrop" id="cartDrawerBackdrop">
+    <div class="cart-drawer" role="dialog" aria-modal="true" aria-label="Panier d'achat">
+      <div class="cart-header">
+        <h3 class="cart-header-title">Votre Panier</h3>
+        <button type="button" class="cart-close-btn" onclick="closeCartDrawer()" aria-label="Fermer le panier">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Liste des articles ajoutés -->
+      <div class="cart-items-container" id="cartItemsContainer">
+        <!-- Rendu dynamique par JavaScript -->
+      </div>
+
+      <!-- Pied du tiroir avec calcul du total -->
+      <div class="cart-footer">
+        <div class="cart-summary-line">
+          <span>Sous-total</span>
+          <span id="cartSubtotal" class="tabular-nums">0 FCFA</span>
+        </div>
+        <div class="cart-total-line">
+          <span>Total à régler</span>
+          <span id="cartTotal" class="tabular-nums">0 FCFA</span>
+        </div>
+
+        <button 
+          type="button" 
+          id="cartCheckoutBtn" 
+          class="btn-primary btn-checkout" 
+          onclick="openCheckoutModal()"
+        >
+          Commander maintenant
+        </button>
+
+        <p class="cart-delivery-note">
+          Paiement à la livraison à Abidjan ou par Mobile Money (Wave / Orange).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- 10. Modale Formulaire Commande (Netlify Forms & WhatsApp) --- -->
+  <div class="modal-overlay" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+    <div class="modal-container checkout-modal-container">
+      <button type="button" class="modal-close-btn" onclick="closeCheckoutModal()" aria-label="Fermer la commande">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="checkout-modal-body">
+        <!-- Formulaire de commande Netlify Forms -->
+        <form 
+          id="checkoutForm" 
+          name="commande" 
+          method="POST" 
+          data-netlify="true" 
+          data-netlify-honeypot="bot-field"
+          onsubmit="handleCheckoutSubmit(event)"
+        >
+          <!-- Champs obligatoires pour Netlify Forms -->
+          <input type="hidden" name="form-name" value="commande" />
+          <p style="display:none">
+            <label>Ne pas remplir : <input name="bot-field" /></label>
+          </p>
+
+          <!-- Champs cachés contenant le récapitulatif textuel et le total en FCFA -->
+          <input type="hidden" name="recapitulatif_commande" id="hiddenRecapitulatif" value="" />
+          <input type="hidden" name="total" id="hiddenTotal" value="" />
+
+          <div class="checkout-header">
+            <h3 id="checkoutModalTitle">Finaliser votre commande</h3>
+            <p>Renseignez vos coordonnées pour la livraison. Aucun paiement en ligne requis immédiatement.</p>
+          </div>
+
+          <!-- Récapitulatif condensé des articles & Calcul Livraison -->
+          <div class="checkout-summary-box">
+            <div class="summary-box-title">Votre sélection :</div>
+            <div class="summary-items-brief" id="checkoutSummaryBrief"></div>
+            
+            <div class="summary-line-sub">
+              <span>Sous-total articles :</span>
+              <span id="checkoutSubtotalDisplay" class="tabular-nums">0 FCFA</span>
+            </div>
+            
+            <div class="summary-line-sub" id="checkoutDeliveryLine">
+              <span id="checkoutDeliveryLabel">Frais de livraison (Ivoire Livraison) :</span>
+              <span id="checkoutDeliveryFeeDisplay" class="tabular-nums">1 500 FCFA</span>
+            </div>
+
+            <div class="summary-total-brief">
+              <span>Net à payer :</span>
+              <span id="checkoutTotalDisplay" class="tabular-nums">0 FCFA</span>
+            </div>
+          </div>
+
+          <!-- Champs Client -->
+          <div class="form-grid">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="clientNom">Nom complet <span class="req">*</span></label>
+                <input 
+                  type="text" 
+                  id="clientNom" 
+                  name="nom" 
+                  class="form-control" 
+                  placeholder="Ex : Marie Koffi" 
+                  required 
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="clientTel">Numéro WhatsApp / Téléphone <span class="req">*</span></label>
+                <input 
+                  type="tel" 
+                  id="clientTel" 
+                  name="telephone" 
+                  class="form-control" 
+                  placeholder="Ex : 07 00 00 00 00" 
+                  required 
+                />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="clientEmail">Adresse e-mail (facultative)</label>
+                <input 
+                  type="email" 
+                  id="clientEmail" 
+                  name="email" 
+                  class="form-control" 
+                  placeholder="nom@exemple.ci" 
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="clientCommune">Commune / Destination <span class="req">*</span></label>
+                <select id="clientCommune" name="commune" class="form-control" onchange="updateDeliveryFeeAndTotals()" required>
+                  <option value="" disabled>Choisir une commune...</option>
+                  <optgroup label="Abidjan — Zone 1 (1 500 FCFA)">
+                    <option value="Cocody (Angré, Riviera, Deux-Plateaux)" data-fee="1500" selected>Cocody (Angré, Riviera, 2 Plateaux)</option>
+                    <option value="Plateau" data-fee="1500">Plateau</option>
+                    <option value="Marcory / Zone 4 / Biétry" data-fee="1500">Marcory / Zone 4 / Biétry</option>
+                  </optgroup>
+                  <optgroup label="Abidjan — Zone 2 (2 000 FCFA)">
+                    <option value="Yopougon" data-fee="2000">Yopougon</option>
+                    <option value="Treichville" data-fee="2000">Treichville</option>
+                    <option value="Koumassi" data-fee="2000">Koumassi</option>
+                    <option value="Adjamé" data-fee="2000">Adjamé</option>
+                    <option value="Attécoubé" data-fee="2000">Attécoubé</option>
+                  </optgroup>
+                  <optgroup label="Abidjan — Zone 3 (2 500 FCFA)">
+                    <option value="Abobo" data-fee="2500">Abobo</option>
+                    <option value="Port-Bouët" data-fee="2500">Port-Bouët</option>
+                    <option value="Bingerville" data-fee="2500">Bingerville</option>
+                    <option value="Songon" data-fee="2500">Songon</option>
+                  </optgroup>
+                  <optgroup label="Périphérie & Intérieur">
+                    <option value="Grand-Bassam" data-fee="2500">Grand-Bassam (2 500 FCFA)</option>
+                    <option value="Intérieur du pays (Expédition Gare/Relais)" data-fee="3500">Intérieur du pays (3 500 FCFA)</option>
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+
+            <!-- Option de livraison Ivoire Livraison -->
+            <div class="form-group">
+              <label class="form-label">Formule d'acheminement <span class="req">*</span></label>
+              <div class="delivery-options-grid">
+                <label class="delivery-radio-card selected" id="deliveryOptionStandard">
+                  <input type="radio" name="delivery_mode" value="standard" checked onchange="updateDeliveryFeeAndTotals()" />
+                  <div class="radio-content">
+                    <div class="delivery-title-line">
+                      <span class="radio-title">🚀 Ivoire Livraison Standard</span>
+                      <span class="badge-ivoire-time">24h ouvrées</span>
+                    </div>
+                    <span class="radio-desc">Attribution automatique à un coursier avec suivi</span>
+                  </div>
+                </label>
+
+                <label class="delivery-radio-card" id="deliveryOptionExpress">
+                  <input type="radio" name="delivery_mode" value="express" onchange="updateDeliveryFeeAndTotals()" />
+                  <div class="radio-content">
+                    <div class="delivery-title-line">
+                      <span class="radio-title">⚡ Course Flash Urgence (Même Jour)</span>
+                      <span class="badge-ivoire-time">Jour même</span>
+                    </div>
+                    <span class="radio-desc">Prioritaire Abidjan (+1 000 F supp. pour livraison express)</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="clientAdresse">Adresse précise ou repère de livraison <span class="req">*</span></label>
+              <input 
+                type="text" 
+                id="clientAdresse" 
+                name="adresse" 
+                class="form-control" 
+                placeholder="Ex : Riviera Bonoumin, carrefour pharmacie, villa 14" 
+                required 
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Mode de paiement souhaité <span class="req">*</span></label>
+              <div class="payment-methods-grid">
+                <label class="payment-radio-card selected">
+                  <input type="radio" name="paiement" value="Paiement en espèces à la livraison" checked />
+                  <div class="radio-content">
+                    <span class="radio-title">Paiement à la livraison</span>
+                    <span class="radio-desc">Espèces remises au coursier Ivoire Livraison</span>
+                  </div>
+                </label>
+
+                <label class="payment-radio-card">
+                  <input type="radio" name="paiement" value="Mobile Money (Wave / Orange Money)" />
+                  <div class="radio-content">
+                    <span class="radio-title">Wave / Mobile Money</span>
+                    <span class="radio-desc">Transfert direct sécurisé à réception</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="clientNote">Instructions particulières (facultatif)</label>
+              <textarea 
+                id="clientNote" 
+                name="note" 
+                class="form-control" 
+                placeholder="Ex : Appeler avant d'arriver, emballage cadeau souhaité..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Zone d'alerte statut (chargement, erreur ou bouton de secours WhatsApp) -->
+          <div id="checkoutAlert" class="checkout-alert"></div>
+
+          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button type="button" class="btn-secondary" onclick="closeCheckoutModal()">Annuler</button>
+            <button type="submit" id="btnSubmitOrder" class="btn-primary">
+              Confirmer ma commande
+            </button>
+          </div>
+        </form>
+
+        <!-- Écran de Succès après transmission de la commande -->
+        <div id="orderSuccessView" class="order-success-view">
+          <div class="success-icon-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="order-success-title">Merci ! Commande bien reçue</h3>
+          <p class="order-success-text">
+            Votre commande a été transmise avec succès à notre équipe. Nous vous contacterons très rapidement pour convenir de l'horaire précis de votre livraison.
+          </p>
+
+          <div class="success-actions-box">
+            <!-- Bouton immédiat WhatsApp pour confirmation instantanée -->
+            <a id="successWaBtn" href="#" target="_blank" rel="noopener" class="btn-wa-confirm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/>
+              </svg>
+              Confirmer aussi sur WhatsApp
+            </a>
+            <button type="button" class="btn-secondary" onclick="closeCheckoutModal(); navigateToPage('articles');">
+              Retourner à la boutique
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- 11. Pied de Page (Footer) --- -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Maison <span>AURA</span></h3>
+          <p>
+            L'excellence du prêt-à-porter, des fragrances de caractère et des accessoires raffinés. Conçu avec passion à Abidjan pour une clientèle exigeante.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-nav">
+            <li><a href="#articles" onclick="navigateToPage('articles'); return false;">Tous les articles</a></li>
+            <li><a href="#apropos" onclick="navigateToSection('apropos'); return false;">Notre histoire</a></li>
+            <li><a href="#livraison" onclick="navigateToSection('livraison'); return false;">Délais & Tarifs</a></li>
+            <li><a href="#contact" onclick="navigateToSection('contact'); return false;">Contact direct</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Boutique en Ligne</h4>
+          <p style="font-size: 0.88rem; color: #BDB7AE; line-height: 1.6; margin-bottom: 0.75rem;">
+            Boutique exclusivement en ligne<br>
+            Commandes ouvertes 24h/24 & 7j/7<br>
+            Livraison à domicile à Abidjan & intérieur<br>
+            Service client & conseils sur WhatsApp
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>
+          © 2026 Maison AURA Abidjan. Tous droits réservés.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- --- 12. Bouton Flottant WhatsApp Fixe --- -->
+  <a 
+    href="https://wa.me/2250701020304?text=Bonjour%20Maison%20AURA,%20j'aimerais%20avoir%20des%20informations%20sur%20vos%20produits." 
+    target="_blank" 
+    rel="noopener" 
+    class="whatsapp-float-btn" 
+    aria-label="Discuter sur WhatsApp"
+    title="Commander sur WhatsApp"
+  >
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/>
+    </svg>
+    <span class="whatsapp-tooltip">Écrivez-nous sur WhatsApp</span>
+  </a>
+
+  <!-- --- 13. Notification Toast Temporaire --- -->
+  <div class="toast-notification" id="toastNotification" role="status" aria-live="polite">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastText">Article ajouté au panier</span>
+  </div>
+
+  <!-- Script principal Vanilla JavaScript (chargé en différé) -->
+  <script src="./script.js" defer></script>
+</body>
+</html>

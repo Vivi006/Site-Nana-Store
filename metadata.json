@@ -1,0 +1,6 @@
+{
+  "name": "Maison AURA — Boutique Chic Abidjan",
+  "description": "Boutique en ligne moderne de mode, parfums et accessoires à Abidjan (Côte d'Ivoire). Commandes via WhatsApp et Netlify Forms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

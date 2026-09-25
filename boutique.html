@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boutique | Nana Store</title>
+  <meta name="description" content="Nana Store, votre boutique d'accessoires, parfums et vêtements à Abidjan.">
+  <meta property="og:title" content="Nana Store">
+  <meta property="og:description" content="Des pièces choisies avec amour à Abidjan.">
+  <meta property="og:image" content="images/logo.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop stop-color='%23FF6EB4'/%3E%3Cstop offset='1' stop-color='%235B7BFF'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23g)' d='m50 5 10 29 30 16-30 16-10 29-10-29-30-16 30-16z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./index.html"><img src="images/logo.png" alt="Logo Nana Store"><span>Nana Store</span></a>
+    <nav class="main-nav" aria-label="Navigation principale"><a href="./index.html">Accueil</a><a href="#boutique">Boutique</a><a href="./index.html#a-propos">À propos</a><a href="./index.html#infos">Livraison</a><a href="./index.html#contact">Contact</a></nav>
+    <button class="cart-button" id="open-cart" aria-label="Ouvrir le panier">🛍️ <span>Panier</span><b id="cart-count">0</b></button>
+  </header>
+  <section class="top-contacts" aria-label="Contacter les associés">
+    <div class="top-contacts-title"><strong>Besoin d'aide ?</strong><span>Contactez-nous directement</span></div>
+    <div class="top-contacts-list" id="top-contact-people"></div>
+  </section>
+
+  <main>
+    <div class="back-home-wrap"><a class="button button-outline" href="./index.html">← Retour à la page principale</a></div>
+    <section class="section boutique-heading" id="boutique">
+      <p class="eyebrow">Nana Store</p>
+      <h1>La boutique <span>✦</span></h1>
+      <p>Découvrez nos accessoires, parfums, vêtements et autres pièces choisies avec soin.</p>
+      <div class="section-heading"><div><h2>Nos coups de cœur</h2></div><p id="product-count" class="muted"></p></div>
+      <div class="shop-tools">
+        <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Rechercher un article..." aria-label="Rechercher"></label>
+        <select id="sort" aria-label="Trier les produits"><option value="default">Trier : nouveautés</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option></select>
+      </div>
+      <div class="categories" id="categories" role="tablist"></div>
+      <div class="product-grid" id="product-grid"><p class="loading">Chargement de nos pépites...</p></div>
+    </section>
+
+  </main>
+
+  <a id="floating-whatsapp" class="floating-whatsapp" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp">☏</a>
+  <footer><div class="footer-brand"><img src="images/logo.png" alt=""><strong>Nana Store</strong></div><p>Des petits bonheurs, livrés à Abidjan.</p><p>© <span id="year"></span> Nana Store · Tous droits réservés.</p></footer>
+
+  <div class="modal-backdrop" id="product-modal" hidden><div class="modal product-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="close" data-close aria-label="Fermer">×</button><div id="modal-content"></div></div></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Votre panier" aria-hidden="true"><div class="drawer-head"><h2>Votre panier</h2><button class="close" id="close-cart" aria-label="Fermer">×</button></div><div id="cart-items" class="cart-items"></div><div class="cart-summary"><div><span>Sous-total articles</span><strong id="cart-total">0 FCFA</strong></div><p id="delivery-note"></p><button class="button button-primary full" id="checkout-button">Passer la commande</button><button class="button button-outline full" id="continue-shopping">Continuer mes achats</button></div></aside>
+  <div class="modal-backdrop" id="checkout-modal" hidden><div class="modal checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title"><button class="close" data-close aria-label="Fermer">×</button><div id="checkout-view"><div class="checkout-header"><span class="checkout-step">Étape finale</span><p class="eyebrow">Nana Store</p><h2 id="checkout-title">Finaliser ma commande</h2><p class="muted">Vérifiez votre sélection puis indiquez vos coordonnées.</p></div><div class="checkout-summary" id="checkout-summary"></div><form name="commande" id="order-form" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" enctype="multipart/form-data"><input type="hidden" name="form-name" value="commande"><input type="hidden" name="numero_commande" id="order-number"><input type="hidden" name="recapitulatif_commande" id="order-summary"><input type="hidden" name="total" id="order-total"><input type="hidden" name="mode_paiement" id="payment-mode"><input type="hidden" name="note_livraison" id="delivery-note-field"><p class="honeypot"><label>Ne pas remplir <input name="bot-field"></label></p><div class="form-grid"><label>Nom complet *<input name="nom" required autocomplete="name"></label><label>Téléphone *<input name="telephone" id="phone" required inputmode="tel" placeholder="+225 07 00 00 00 00"></label><label>E-mail (facultatif)<input type="email" name="email" autocomplete="email"></label><label>Commune *<select name="commune" required><option value="" selected disabled>Choisissez votre commune</option><option>Abobo</option><option>Adjamé</option><option>Anyama</option><option>Attécoubé</option><option>Bingerville</option><option>Cocody</option><option>Koumassi</option><option>Marcory</option><option>Plateau</option><option>Port-Bouët</option><option>Songon</option><option>Treichville</option><option>Yopougon</option></select></label><label class="wide">Quartier / adresse précise *<textarea name="adresse" required rows="2"></textarea></label><label class="wide">Note (facultatif)<textarea name="note" rows="2"></textarea></label></div><fieldset><legend>Mode de paiement *</legend><div id="payment-options"></div></fieldset><div id="mobile-payment-fields" hidden></div><p class="safety">🔒 Nana Store ne demande jamais de code PIN, mot de passe ou numéro de carte bancaire.</p><button class="button button-primary full" id="submit-order" type="submit">Envoyer ma commande</button><p id="form-message" class="form-message" role="alert"></p></form></div><div id="success-view" hidden></div></div></div>
+  <form name="commande-netlify" data-netlify="true" data-netlify-honeypot="bot-field" hidden><input name="form-name" value="commande"><input name="nom"><input name="telephone"><input name="email"><input name="commune"><input name="adresse"><input name="recapitulatif_commande"><input name="total"><input name="mode_paiement"><input name="note_livraison"><input name="numero_commande"></form>
+  <script src="script.js"></script>
+</body>
+</html>
