@@ -5,7 +5,7 @@ const CONFIG = {
   catalogueEndpointUrl: "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec",
   // Remplissez une fiche par associée. La première reçoit les liens WhatsApp principaux.
   collaboratrices: [
-    { nom: "Associé 1", whatsapp: "+225 05 45 15 31 93" },
+    { nom: "Associée 1", whatsapp: "+225 05 45 15 31 93" },
     { nom: "Associée 2", whatsapp: "+225 01 60 30 76 85" }
   ],
   livraison: { actif: true, texteAffiche: "1 500 à 2 000 FCFA selon votre commune", livraisonPayeePar: "client" },
