@@ -27,6 +27,9 @@ const WHATSAPP_CONTACT = "+225 05 45 15 31 93";
 const PRODUITS_SHEET_NAME = "Produits";
 const PRODUITS_HEADERS = ["id", "nom", "categorie", "prix", "description", "image", "stock", "nouveau", "tailles"];
 const ADMIN_TOKEN_TTL_SECONDS = 21600;
+const PRODUCT_IMAGES_FOLDER_PROPERTY = "PRODUCT_IMAGES_FOLDER_ID";
+const PRODUCT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const PRODUCT_IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
 
 function jsonResponse(payload) {
   return ContentService.createTextOutput(JSON.stringify(payload))
@@ -70,8 +73,82 @@ function isAdminTokenValid(token) {
   return token && CacheService.getScriptCache().get(token) === "admin";
 }
 
+function productImagesFolder() {
+  const properties = PropertiesService.getScriptProperties();
+  const configuredId = properties.getProperty(PRODUCT_IMAGES_FOLDER_PROPERTY);
+  if (configuredId) {
+    try {
+      return { folder: DriveApp.getFolderById(configuredId), created: false };
+    } catch (error) {
+      throw new Error("Le dossier Drive configuré est introuvable. Vérifiez PRODUCT_IMAGES_FOLDER_ID.");
+    }
+  }
+  const folder = DriveApp.createFolder("Nana Store - Images");
+  properties.setProperty(PRODUCT_IMAGES_FOLDER_PROPERTY, folder.getId());
+  return { folder: folder, created: true };
+}
+
+function imageUrl(fileId) {
+  return "https://drive.google.com/uc?export=view&id=" + encodeURIComponent(fileId);
+}
+
+function imageDetails(file) {
+  return { id: file.getId(), name: file.getName(), mimeType: file.getMimeType(), url: imageUrl(file.getId()) };
+}
+
+function listImages(folder) {
+  const files = folder.getFiles();
+  const images = [];
+  while (files.hasNext()) {
+    const file = files.next();
+    if (!file.isTrashed() && PRODUCT_IMAGE_MIME_TYPES.indexOf(file.getMimeType()) !== -1) {
+      images.push(imageDetails(file));
+    }
+  }
+  images.sort(function (a, b) { return a.name.localeCompare(b.name, "fr"); });
+  return images;
+}
+
+function handleImageAction(data) {
+  if (!isAdminTokenValid(data.token)) return { ok: false, error: "Session administrateur expirée." };
+  const folderInfo = productImagesFolder();
+  const folder = folderInfo.folder;
+  if (data.action === "listImages") {
+    return { ok: true, images: listImages(folder), folderId: folder.getId(), folderCreated: folderInfo.created };
+  }
+  if (data.action === "uploadImage") {
+    const base64 = String(data.base64 || "").replace(/^data:[^;]+;base64,/, "");
+    const mimeType = String(data.mimeType || "").toLowerCase();
+    const name = String(data.name || "").trim().replace(/[\\\/:*?"<>|]/g, "_");
+    if (!base64 || !name) return { ok: false, error: "Nom et contenu de l'image requis." };
+    if (PRODUCT_IMAGE_MIME_TYPES.indexOf(mimeType) === -1) return { ok: false, error: "Format d'image non pris en charge (JPEG, PNG, GIF, WebP ou AVIF)." };
+    if (base64.length > Math.ceil(PRODUCT_IMAGE_MAX_BYTES * 4 / 3) + 128) return { ok: false, error: "Image trop volumineuse (5 Mo maximum)." };
+    let bytes;
+    try { bytes = Utilities.base64Decode(base64); } catch (error) { return { ok: false, error: "Contenu base64 invalide." }; }
+    if (bytes.length > PRODUCT_IMAGE_MAX_BYTES) return { ok: false, error: "Image trop volumineuse (5 Mo maximum)." };
+    const file = folder.createFile(Utilities.newBlob(bytes, mimeType, name));
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return { ok: true, image: imageDetails(file), folderId: folder.getId(), folderCreated: folderInfo.created };
+  }
+  if (data.action === "deleteImage") {
+    const id = String(data.id || "");
+    if (!id) return { ok: false, error: "Identifiant d'image requis." };
+    const files = folder.getFiles();
+    let found = false;
+    while (files.hasNext()) {
+      const file = files.next();
+      if (file.getId() === id && PRODUCT_IMAGE_MIME_TYPES.indexOf(file.getMimeType()) !== -1) { found = true; break; }
+    }
+    if (!found) return { ok: false, error: "Image introuvable dans le dossier configuré." };
+    DriveApp.getFileById(id).setTrashed(true);
+    return { ok: true, id: id };
+  }
+  return { ok: false, error: "Action image inconnue." };
+}
+
 function handleProductAction(data) {
   const action = data.action;
+  if (action === "listImages" || action === "uploadImage" || action === "deleteImage") return handleImageAction(data);
   if (action === "list") return { ok: true, products: listProducts() };
   if (action === "login") {
     const password = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSWORD");
