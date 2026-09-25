@@ -18,13 +18,12 @@
 // Vous pouvez ajouter, modifier ou supprimer des adresses e-mails à tout moment ici :
 const NOTIFICATION_EMAILS = [
   "vitianacharles28@gmail.com",
-  // Pour ajouter l'adresse e-mail de votre amie, décommentez la ligne ci-dessous :
-  // "adresse_amie@gmail.com",
+  "kouadiothalmas@gmail.com",
 ];
 
 // Paramètres de la boutique
 const NOM_BOUTIQUE = "Nana Store";
-const WHATSAPP_CONTACT = "+225 07 01 02 03 04";
+const WHATSAPP_CONTACT = "+225 05 45 15 31 93";
 const PRODUITS_SHEET_NAME = "Produits";
 const PRODUITS_HEADERS = ["id", "nom", "categorie", "prix", "description", "image", "stock", "nouveau", "tailles"];
 const ADMIN_TOKEN_TTL_SECONDS = 21600;
