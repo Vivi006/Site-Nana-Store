@@ -28,10 +28,10 @@
     <section id="admin-panel" class="hidden">
       <div class="panel"><div class="actions"><button class="button button-primary" id="new-product">Nouveau produit</button><button class="button button-outline" id="logout">Se déconnecter</button></div></div>
       <section class="panel">
-        <h2>Images produit (Google Drive)</h2>
-        <p>Formats JPEG, PNG, GIF, WebP ou AVIF — 5 Mo maximum. Les images sont rendues accessibles par lien pour la boutique.</p>
-        <div class="actions"><input id="image-file" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif"><button class="button button-primary" id="upload-image" type="button">Téléverser</button><button class="button button-outline" id="refresh-images" type="button">Actualiser</button></div>
-        <p id="image-error" class="error"></p><p id="image-folder"></p><div id="image-gallery" class="gallery"></div>
+        <h2>Images produit (Cloudinary)</h2>
+        <p>Formats JPEG, PNG, GIF, WebP ou AVIF — 5 Mo maximum. Les fichiers sont téléversés directement depuis votre téléphone ou ordinateur.</p>
+        <div class="actions"><input id="image-file" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif"><button class="button button-primary" id="upload-image" type="button">Téléverser</button></div>
+        <p id="image-error" class="error"></p><div id="image-gallery" class="gallery"></div>
       </section>
       <form id="product-form" class="panel hidden">
         <h2 id="form-title">Produit</h2><div class="grid">
@@ -46,6 +46,9 @@
   </main>
   <script>
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec";
+    // Remplacez ces deux placeholders par les valeurs de Cloudinary (aucune clé secrète ici).
+    const CLOUDINARY_CLOUD_NAME = "VOTRE_CLOUD_NAME";
+    const CLOUDINARY_UPLOAD_PRESET = "VOTRE_UPLOAD_PRESET_UNSIGNED";
     const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
     const state = {token: sessionStorage.getItem("nana-admin-token") || "", products: [], images: [], editing: null};
     const $ = (s) => document.querySelector(s);
@@ -53,31 +56,29 @@
       const response = await fetch(ENDPOINT, {method:"POST", body:JSON.stringify({action, token:state.token, ...extra})});
       const data = await response.json(); if (!data.ok) throw new Error(data.error || "Erreur serveur"); return data;
     }
-    function showAdmin() { $("#login-panel").classList.add("hidden"); $("#admin-panel").classList.remove("hidden"); load(); loadImages(); }
+    function showAdmin() { $("#login-panel").classList.add("hidden"); $("#admin-panel").classList.remove("hidden"); load(); }
     async function login(event) { event.preventDefault(); $("#login-error").textContent=""; try { const data=await call("login",{password:$("#password").value}); state.token=data.token; sessionStorage.setItem("nana-admin-token",state.token); showAdmin(); } catch(e) { $("#login-error").textContent=e.message; } }
-    async function load() { try { const data=await call("list"); state.products=data.products; render(); } catch(e) { if(e.message.includes("Session")) logout(); else alert(e.message); } }
-    async function loadImages() {
-      try { const data=await call("listImages"); state.images=data.images || []; $("#image-folder").textContent=data.folderCreated ? "Dossier créé automatiquement. ID à conserver : " + data.folderId : "Dossier Drive : " + data.folderId; renderImages(); }
-      catch(e) { $("#image-error").textContent=e.message; if(e.message.includes("Session")) logout(); }
-    }
+    async function load() { try { const data=await call("list"); state.products=data.products; render(); renderImages(); } catch(e) { if(e.message.includes("Session")) logout(); else alert(e.message); } }
     function renderImages() {
-      $("#image-gallery").innerHTML=state.images.map(image=>`<article class="image-card${$("#product-form [name=image]").value===image.url?" selected":""}"><img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.name)}"><small>${escapeHtml(image.name)}</small><div class="actions"><button type="button" data-use-image="${escapeHtml(image.url)}">Choisir</button><button type="button" data-delete-image="${escapeHtml(image.id)}">Supprimer</button></div></article>`).join("") || "<p>Aucune image téléversée.</p>";
+      const urls = [...new Set([...state.products.map(p=>p.image).filter(Boolean), ...state.images.map(image=>image.url)])];
+      const selected = $("#product-form [name=image]").value;
+      $("#image-gallery").innerHTML=`<article class="image-card${selected?"":" selected"}"><p>Aucune image</p><button type="button" data-clear-image>Retirer l'association</button></article>` +
+        urls.map(url=>`<article class="image-card${selected===url?" selected":""}"><img src="${escapeHtml(url)}" alt="Image produit"><button type="button" data-use-image="${escapeHtml(url)}">Choisir</button></article>`).join("") || "<p>Aucune image utilisée.</p>";
       document.querySelectorAll("[data-use-image]").forEach(button=>button.onclick=()=>{ $("#product-form [name=image]").value=button.dataset.useImage; renderImages(); });
-      document.querySelectorAll("[data-delete-image]").forEach(button=>button.onclick=()=>deleteImage(button.dataset.deleteImage));
+      document.querySelector("[data-clear-image]").onclick=()=>{ $("#product-form [name=image]").value=""; renderImages(); };
     }
     async function uploadImage() {
       const input=$("#image-file"), file=input.files[0]; $("#image-error").textContent="";
       if(!file) { $("#image-error").textContent="Sélectionnez une image."; return; }
       if(file.size>MAX_IMAGE_BYTES) { $("#image-error").textContent="Image trop volumineuse (5 Mo maximum)."; return; }
       if(!file.type.startsWith("image/")) { $("#image-error").textContent="Le fichier doit être une image."; return; }
+      if(CLOUDINARY_CLOUD_NAME.startsWith("VOTRE_") || CLOUDINARY_UPLOAD_PRESET.startsWith("VOTRE_")) { $("#image-error").textContent="Configurez CLOUDINARY_CLOUD_NAME et CLOUDINARY_UPLOAD_PRESET_UNSIGNED dans admin.html."; return; }
       try {
-        const base64=await new Promise((resolve,reject)=>{const reader=new FileReader(); reader.onload=()=>resolve(String(reader.result).split(",")[1]); reader.onerror=()=>reject(new Error("Lecture du fichier impossible.")); reader.readAsDataURL(file);});
-        const data=await call("uploadImage",{name:file.name,mimeType:file.type,base64:base64}); state.images.unshift(data.image); input.value=""; renderImages();
+        const body=new FormData(); body.append("file",file); body.append("upload_preset",CLOUDINARY_UPLOAD_PRESET);
+        const response=await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(CLOUDINARY_CLOUD_NAME)}/image/upload`,{method:"POST",body});
+        const data=await response.json(); if(!response.ok || !data.secure_url) throw new Error(data.error?.message || "Téléversement Cloudinary impossible.");
+        state.images.unshift({url:data.secure_url}); $("#product-form [name=image]").value=data.secure_url; input.value=""; renderImages();
       } catch(e) { $("#image-error").textContent=e.message; }
-    }
-    async function deleteImage(id) {
-      if(!confirm("Supprimer définitivement cette image de Google Drive ?")) return;
-      try { await call("deleteImage",{id:id}); state.images=state.images.filter(image=>image.id!==id); renderImages(); } catch(e) { $("#image-error").textContent=e.message; }
     }
     function render() { $("#products").innerHTML=state.products.map(p=>`<tr><td>${p.image?`<img src="${escapeHtml(p.image)}" alt="">`:"—"}</td><td>${escapeHtml(p.nom)}</td><td>${escapeHtml(p.categorie)}</td><td>${Number(p.prix).toLocaleString("fr-FR")} FCFA</td><td>${p.stock}</td><td>${p.disponibilite==="en_stock"?"En stock":"Épuisé"}</td><td class="actions"><button data-edit="${p.id}">Modifier</button><button data-delete="${p.id}">Supprimer</button></td></tr>`).join("") || '<tr><td colspan="7">Aucun produit.</td></tr>'; document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>edit(b.dataset.edit)); document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>remove(b.dataset.delete)); }
     function escapeHtml(value) { return String(value||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
@@ -86,7 +87,7 @@
     async function save(event) { event.preventDefault(); const f=new FormData(event.target), product=Object.fromEntries(f.entries()); product.id=state.editing||""; product.prix=Number(product.prix); product.stock=Number(product.stock); product.nouveau=f.get("nouveau")==="on"; product.tailles=product.tailles.split(",").map(x=>x.trim()).filter(Boolean); try { await call("save",{product}); state.editing=null; event.target.classList.add("hidden"); await load(); } catch(e) { $("#form-error").textContent=e.message; } }
     async function remove(id) { if(!confirm("Supprimer ce produit ?"))return; try { await call("delete",{id}); await load(); } catch(e) { alert(e.message); } }
     function logout() { sessionStorage.removeItem("nana-admin-token"); state.token=""; $("#admin-panel").classList.add("hidden"); $("#login-panel").classList.remove("hidden"); }
-    $("#login-form").onsubmit=login; $("#product-form").onsubmit=save; $("#new-product").onclick=()=>{state.editing=null;fill();$("#form-title").textContent="Nouveau produit";$("#product-form").classList.remove("hidden")}; $("#cancel").onclick=()=>$("#product-form").classList.add("hidden"); $("#logout").onclick=logout; $("#upload-image").onclick=uploadImage; $("#refresh-images").onclick=loadImages;
+    $("#login-form").onsubmit=login; $("#product-form").onsubmit=save; $("#new-product").onclick=()=>{state.editing=null;fill();$("#form-title").textContent="Nouveau produit";$("#product-form").classList.remove("hidden")}; $("#cancel").onclick=()=>$("#product-form").classList.add("hidden"); $("#logout").onclick=logout; $("#upload-image").onclick=uploadImage;
     if(state.token) showAdmin();
   </script>
 </body>

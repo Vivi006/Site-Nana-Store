@@ -8,8 +8,8 @@ avec ces colonnes, dans cet ordre :
 
 `id | nom | categorie | prix | description | image | stock | nouveau | tailles`
 
-`prix` et `stock` sont numériques. `image` est une URL publique (l'interface peut
-générer une URL Google Drive). `tailles` contient des valeurs séparées par des virgules. La disponibilité
+`prix` et `stock` sont numériques. `image` est une URL publique Cloudinary ou
+une URL historique `images/...`. `tailles` contient des valeurs séparées par des virgules. La disponibilité
 est calculée côté serveur : `stock > 0` donne `en_stock`, sinon `epuise`.
 
 ### Déploiement et mot de passe admin
@@ -26,35 +26,29 @@ est calculée côté serveur : `stock > 0` donne `en_stock`, sinon `epuise`.
    `login`, `list`, `save` et `delete`; une protection frontend seule ne serait
    pas une sécurité suffisante.
 
-### Images produit dans Google Drive
+### Images produit avec Cloudinary
 
-L'interface `/admin.html` propose aussi une galerie d'images. Les actions
-`listImages`, `uploadImage` et `deleteImage` exigent le même token de session
-administrateur. Les téléversements sont limités à 5 Mo et aux formats JPEG,
-PNG, GIF, WebP et AVIF.
+L'interface `/admin.html` téléverse directement les fichiers vers Cloudinary avec
+un **upload preset unsigned**. Le script Apps Script ne reçoit ni fichier ni
+clé Cloudinary : il conserve uniquement les URLs dans l'onglet `Produits`.
 
-1. Dans **Paramètres du projet → Propriétés du script**, vous pouvez ajouter
-   `PRODUCT_IMAGES_FOLDER_ID` avec l'identifiant d'un dossier Drive existant.
-   Le compte qui exécute le déploiement doit pouvoir y écrire.
-2. Si cette propriété est absente, le premier chargement de la galerie crée
-   automatiquement **Nana Store - Images** à la racine de votre Drive, enregistre
-   son identifiant dans la propriété et l'affiche clairement dans l'interface.
-   Vous pouvez ensuite remplacer la propriété par l'ID d'un autre dossier si
-   nécessaire.
-3. Connectez-vous à `/admin.html`, sélectionnez un fichier local (5 Mo maximum),
-   puis cliquez sur **Téléverser**. Google Drive rend le fichier lisible par
-   lien et la galerie permet de le **Choisir** pour renseigner automatiquement
-   l'URL du champ image du produit. **Supprimer** demande confirmation et place
-   le fichier à la corbeille Drive.
-4. Pour migrer les images historiques du dépôt une seule fois, ouvrez le
-   dossier d'images (`images/`), téléversez ses fichiers dans le dossier Drive
-   configuré (glisser-déposer dans Drive ou via la galerie), puis choisissez
-   chaque image dans l'administration et enregistrez le produit. Les anciennes
-   URLs `images/...` restent valides : aucune migration n'est obligatoire.
+1. Créez un compte sur [Cloudinary](https://cloudinary.com/), puis relevez le
+   **Cloud name** dans le tableau de bord.
+2. Dans **Settings → Upload → Upload presets**, créez un preset et activez
+   **unsigned upload**. Copiez son nom.
+3. Dans `admin.html`, remplacez les placeholders
+   `CLOUDINARY_CLOUD_NAME` et `CLOUDINARY_UPLOAD_PRESET` par ces valeurs.
+   Ne collez jamais une API secret dans le navigateur.
+4. Connectez-vous à l'administration, choisissez un fichier (JPEG, PNG, GIF,
+   WebP ou AVIF, 5 Mo maximum), puis téléversez-le. La galerie est construite
+   sans API Cloudinary à partir des URLs des produits déjà listés. Choisir une
+   image l'associe au produit ; **Retirer l'association** vide ce champ sans
+   supprimer le fichier Cloudinary.
 
-Les fichiers Drive sont configurés « accessible à toute personne disposant du
-lien » afin que la boutique publique puisse afficher les URLs retournées.
-N'utilisez pas ce dossier pour des documents confidentiels.
+Les limites Cloudinary (quota, taille et transformations) dépendent du forfait.
+Un preset unsigned est public par conception : configurez ses restrictions
+(format, taille et dossier) dans Cloudinary. Les URLs historiques `images/...`
+restent valides et ne nécessitent aucune migration.
 
 La boutique demande `?action=list` à l'endpoint. En cas d'indisponibilité ou
 d'URL non configurée, elle conserve automatiquement le repli sur `products.json`.
