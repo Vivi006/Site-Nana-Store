@@ -2,6 +2,7 @@
 const CONFIG = {
   nom: "Nana Store",
   googleSheetWebAppUrl: "[URL_DU_SCRIPT_APPS_SCRIPT]",
+  catalogueEndpointUrl: "[URL_DU_SCRIPT_APPS_SCRIPT]",
   // Remplissez une fiche par associée. La première reçoit les liens WhatsApp principaux.
   collaboratrices: [
     { nom: "Associé 1", whatsapp: "+225 05 45 15 31 93" },
@@ -154,7 +155,28 @@ async function init() {
     return `<article class="top-contact-card"><strong>${person.nom}</strong><div><a class="contact-action contact-action-whatsapp" href="${personWhatsappUrl(person, `Bonjour ${person.nom}, j'aimerais avoir un renseignement.`)}" target="_blank" rel="noopener">💬 WhatsApp</a><a class="contact-action contact-action-call" href="tel:${phone}">☎ Appeler</a></div></article>`;
   }).join("");
   if (!$("#product-grid")) return;
-  try { const response = await fetch("products.json", { cache: "no-store" }); if (!response.ok) throw new Error("Catalogue introuvable"); state.products = await response.json(); reconcileCart(); renderCategories(); renderProducts(); updateCart(); } catch (error) { $("#product-grid").innerHTML = '<p class="empty">Le catalogue est momentanément indisponible. Réessayez dans un instant.</p>'; }
+  try {
+    let products = null;
+    const endpoint = CONFIG.catalogueEndpointUrl;
+    if (endpoint && !endpoint.startsWith("[")) {
+      const response = await fetch(`${endpoint}?action=list`, { cache: "no-store" });
+      if (response.ok) {
+        const payload = await response.json();
+        if (payload.ok && Array.isArray(payload.products)) products = payload.products;
+      }
+    }
+    if (!products) {
+      const response = await fetch("products.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("Catalogue introuvable");
+      products = await response.json();
+    }
+    state.products = products.map((product) => ({
+      ...product,
+      stock: Number.isFinite(Number(product.stock)) ? Number(product.stock) : (product.disponibilite === "en_stock" ? 1 : 0),
+      disponibilite: Number(product.stock) > 0 || (!("stock" in product) && product.disponibilite === "en_stock") ? "en_stock" : "epuise"
+    }));
+    reconcileCart(); renderCategories(); renderProducts(); updateCart();
+  } catch (error) { $("#product-grid").innerHTML = '<p class="empty">Le catalogue est momentanément indisponible. Réessayez dans un instant.</p>'; }
   $("#search").addEventListener("input", (event) => { state.query = event.target.value; renderProducts(); }); $("#sort").addEventListener("change", (event) => { state.sort = event.target.value; renderProducts(); }); $("#open-cart").addEventListener("click", openCart); $("#close-cart").addEventListener("click", closeCart); $("#continue-shopping").addEventListener("click", closeCart); $("#checkout-button").addEventListener("click", startCheckout); $("#order-form").addEventListener("submit", submitOrder); document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", closeModals)); document.querySelectorAll(".modal-backdrop").forEach((modal) => modal.addEventListener("click", (event) => { if (event.target === modal) closeModals(); }));
 }
 init();

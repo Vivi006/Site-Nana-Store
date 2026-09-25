@@ -17,7 +17,7 @@
 // ==============================================================================
 // Vous pouvez ajouter, modifier ou supprimer des adresses e-mails à tout moment ici :
 const NOTIFICATION_EMAILS = [
-  "VOTRE_EMAIL_INTERNE",
+  "vitianacharles28@gmail.com",
   // Pour ajouter l'adresse e-mail de votre amie, décommentez la ligne ci-dessous :
   // "adresse_amie@gmail.com",
 ];
@@ -25,12 +25,103 @@ const NOTIFICATION_EMAILS = [
 // Paramètres de la boutique
 const NOM_BOUTIQUE = "Nana Store";
 const WHATSAPP_CONTACT = "+225 07 01 02 03 04";
+const PRODUITS_SHEET_NAME = "Produits";
+const PRODUITS_HEADERS = ["id", "nom", "categorie", "prix", "description", "image", "stock", "nouveau", "tailles"];
+const ADMIN_TOKEN_TTL_SECONDS = 21600;
+
+function jsonResponse(payload) {
+  return ContentService.createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function productSheet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PRODUITS_SHEET_NAME)
+    || SpreadsheetApp.getActiveSpreadsheet().insertSheet(PRODUITS_SHEET_NAME);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, PRODUITS_HEADERS.length).setValues([PRODUITS_HEADERS]);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function productFromRow(row) {
+  const stock = Math.max(0, Number(row[6]) || 0);
+  return {
+    id: String(row[0] || ""),
+    nom: String(row[1] || ""),
+    categorie: String(row[2] || ""),
+    prix: Number(row[3]) || 0,
+    description: String(row[4] || ""),
+    image: String(row[5] || ""),
+    stock: stock,
+    disponibilite: stock > 0 ? "en_stock" : "epuise",
+    nouveau: row[7] === true || String(row[7]).toLowerCase() === "true" || String(row[7]) === "1",
+    tailles: String(row[8] || "").split(/[,;\/]/).map(function (size) { return size.trim(); }).filter(Boolean)
+  };
+}
+
+function listProducts() {
+  const sheet = productSheet();
+  if (sheet.getLastRow() < 2) return [];
+  return sheet.getRange(2, 1, sheet.getLastRow() - 1, PRODUITS_HEADERS.length)
+    .getValues().filter(function (row) { return row[0]; }).map(productFromRow);
+}
+
+function isAdminTokenValid(token) {
+  return token && CacheService.getScriptCache().get(token) === "admin";
+}
+
+function handleProductAction(data) {
+  const action = data.action;
+  if (action === "list") return { ok: true, products: listProducts() };
+  if (action === "login") {
+    const password = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSWORD");
+    if (!password || data.password !== password) return { ok: false, error: "Identifiants invalides." };
+    const token = Utilities.getUuid();
+    CacheService.getScriptCache().put(token, "admin", ADMIN_TOKEN_TTL_SECONDS);
+    return { ok: true, token: token };
+  }
+  if (!isAdminTokenValid(data.token)) return { ok: false, error: "Session administrateur expirée." };
+  const sheet = productSheet();
+  if (action === "delete") {
+    const id = String(data.id || "");
+    const values = sheet.getRange(2, 1, Math.max(sheet.getLastRow() - 1, 1), 1).getValues();
+    for (let i = 0; i < values.length; i++) {
+      if (String(values[i][0]) === id) { sheet.deleteRow(i + 2); return { ok: true }; }
+    }
+    return { ok: false, error: "Produit introuvable." };
+  }
+  if (action === "save") {
+    const product = data.product || {};
+    const id = String(product.id || Utilities.getUuid());
+    const row = [id, String(product.nom || ""), String(product.categorie || ""), Number(product.prix) || 0,
+      String(product.description || ""), String(product.image || ""), Math.max(0, Number(product.stock) || 0),
+      product.nouveau === true || product.nouveau === "true", Array.isArray(product.tailles) ? product.tailles.join(", ") : String(product.tailles || "")];
+    const ids = sheet.getRange(2, 1, Math.max(sheet.getLastRow() - 1, 1), 1).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]) === id) { sheet.getRange(i + 2, 1, 1, row.length).setValues([row]); return { ok: true, product: productFromRow(row) }; }
+    }
+    sheet.appendRow(row);
+    return { ok: true, product: productFromRow(row) };
+  }
+  return { ok: false, error: "Action inconnue." };
+}
+
+function doGet(e) {
+  try {
+    if (e && e.parameter && e.parameter.action === "list") return jsonResponse({ ok: true, products: listProducts() });
+    return jsonResponse({ ok: false, error: "Action requise." });
+  } catch (error) { return jsonResponse({ ok: false, error: error.toString() }); }
+}
 
 // ==============================================================================
 // 2. RÉCEPTION ET TRAITEMENT DE LA COMMANDE (Méthode POST)
 // ==============================================================================
 function doPost(e) {
   try {
+    let incoming = {};
+    if (e && e.postData && e.postData.contents) incoming = JSON.parse(e.postData.contents);
+    if (incoming.action) return jsonResponse(handleProductAction(incoming));
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = spreadsheet.getSheetByName("Commandes");
     
@@ -73,7 +164,7 @@ function doPost(e) {
     let data = {};
     if (e.postData && e.postData.contents) {
       try {
-        data = JSON.parse(e.postData.contents);
+        data = incoming;
       } catch (err) {
         data = e.parameter || {};
       }

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Administration produits | Nana Store</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{background:#faf7f4}.admin{max-width:1100px;margin:40px auto;padding:0 20px}
+    .panel{background:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 30px #35251b12;margin:20px 0}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.wide{grid-column:1/-1}
+    label{display:grid;gap:6px;font-weight:600}input,textarea,select{padding:11px;border:1px solid #ddd;border-radius:8px;font:inherit}
+    table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid #eee}td img{width:48px;height:48px;object-fit:cover;border-radius:6px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}.error{color:#b42318}.hidden{display:none}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}table{font-size:13px}}
+  </style>
+</head>
+<body>
+  <main class="admin">
+    <a href="./boutique.html">← Retour à la boutique</a>
+    <h1>Gestion des produits</h1>
+    <p>Cette page utilise l'authentification du serveur Apps Script. Le mot de passe n'est jamais stocké dans le navigateur.</p>
+    <section id="login-panel" class="panel">
+      <form id="login-form"><label>Mot de passe administrateur<input id="password" type="password" required autocomplete="current-password"></label>
+        <button class="button button-primary" type="submit">Se connecter</button><p id="login-error" class="error"></p>
+      </form>
+    </section>
+    <section id="admin-panel" class="hidden">
+      <div class="panel"><div class="actions"><button class="button button-primary" id="new-product">Nouveau produit</button><button class="button button-outline" id="logout">Se déconnecter</button></div></div>
+      <form id="product-form" class="panel hidden">
+        <h2 id="form-title">Produit</h2><div class="grid">
+          <label>Nom *<input name="nom" required></label><label>Catégorie *<input name="categorie" required></label>
+          <label>Prix (FCFA) *<input name="prix" type="number" min="0" required></label><label>Stock *<input name="stock" type="number" min="0" required></label>
+          <label class="wide">Description<textarea name="description" rows="3"></textarea></label><label class="wide">Image (URL)<input name="image" type="url"></label>
+          <label>Tailles (séparées par virgule)<input name="tailles"></label><label><span>Nouveau</span><input name="nouveau" type="checkbox"></label>
+        </div><div class="actions"><button class="button button-primary" type="submit">Enregistrer</button><button class="button button-outline" id="cancel" type="button">Annuler</button></div><p id="form-error" class="error"></p>
+      </form>
+      <section class="panel"><h2>Catalogue</h2><div style="overflow:auto"><table><thead><tr><th>Image</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Disponibilité</th><th></th></tr></thead><tbody id="products"></tbody></table></div></section>
+    </section>
+  </main>
+  <script>
+    const ENDPOINT = "[URL_DU_SCRIPT_APPS_SCRIPT]";
+    const state = {token: sessionStorage.getItem("nana-admin-token") || "", products: [], editing: null};
+    const $ = (s) => document.querySelector(s);
+    async function call(action, extra = {}) {
+      const response = await fetch(ENDPOINT, {method:"POST", body:JSON.stringify({action, token:state.token, ...extra})});
+      const data = await response.json(); if (!data.ok) throw new Error(data.error || "Erreur serveur"); return data;
+    }
+    function showAdmin() { $("#login-panel").classList.add("hidden"); $("#admin-panel").classList.remove("hidden"); load(); }
+    async function login(event) { event.preventDefault(); $("#login-error").textContent=""; try { const data=await call("login",{password:$("#password").value}); state.token=data.token; sessionStorage.setItem("nana-admin-token",state.token); showAdmin(); } catch(e) { $("#login-error").textContent=e.message; } }
+    async function load() { try { const data=await call("list"); state.products=data.products; render(); } catch(e) { if(e.message.includes("Session")) logout(); else alert(e.message); } }
+    function render() { $("#products").innerHTML=state.products.map(p=>`<tr><td>${p.image?`<img src="${escapeHtml(p.image)}" alt="">`:"—"}</td><td>${escapeHtml(p.nom)}</td><td>${escapeHtml(p.categorie)}</td><td>${Number(p.prix).toLocaleString("fr-FR")} FCFA</td><td>${p.stock}</td><td>${p.disponibilite==="en_stock"?"En stock":"Épuisé"}</td><td class="actions"><button data-edit="${p.id}">Modifier</button><button data-delete="${p.id}">Supprimer</button></td></tr>`).join("") || '<tr><td colspan="7">Aucun produit.</td></tr>'; document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>edit(b.dataset.edit)); document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>remove(b.dataset.delete)); }
+    function escapeHtml(value) { return String(value||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
+    function edit(id) { const p=state.products.find(x=>x.id===id); if(!p)return; state.editing=id; $("#form-title").textContent="Modifier le produit"; fill(p); $("#product-form").classList.remove("hidden"); }
+    function fill(p={}) { const f=$("#product-form"); Object.keys(p).forEach(k=>{if(f.elements[k]) f.elements[k].type==="checkbox"?f.elements[k].checked=!!p[k]:f.elements[k].value=Array.isArray(p[k])?p[k].join(", "):p[k]||"";}); }
+    async function save(event) { event.preventDefault(); const f=new FormData(event.target), product=Object.fromEntries(f.entries()); product.id=state.editing||""; product.prix=Number(product.prix); product.stock=Number(product.stock); product.nouveau=f.get("nouveau")==="on"; product.tailles=product.tailles.split(",").map(x=>x.trim()).filter(Boolean); try { await call("save",{product}); state.editing=null; event.target.classList.add("hidden"); await load(); } catch(e) { $("#form-error").textContent=e.message; } }
+    async function remove(id) { if(!confirm("Supprimer ce produit ?"))return; try { await call("delete",{id}); await load(); } catch(e) { alert(e.message); } }
+    function logout() { sessionStorage.removeItem("nana-admin-token"); state.token=""; $("#admin-panel").classList.add("hidden"); $("#login-panel").classList.remove("hidden"); }
+    $("#login-form").onsubmit=login; $("#product-form").onsubmit=save; $("#new-product").onclick=()=>{state.editing=null;fill();$("#form-title").textContent="Nouveau produit";$("#product-form").classList.remove("hidden")}; $("#cancel").onclick=()=>$("#product-form").classList.add("hidden"); $("#logout").onclick=logout;
+    if(state.token) showAdmin();
+  </script>
+</body>
+</html>

@@ -1,5 +1,36 @@
 # Enregistrer les commandes Nana Store dans Google Sheets
 
+## Catalogue et administration (Produits)
+
+Le fichier `google-apps-script.js` gère maintenant les commandes **et** un onglet
+`Produits` dans le même classeur. Créez cet onglet (ou laissez le script le créer)
+avec ces colonnes, dans cet ordre :
+
+`id | nom | categorie | prix | description | image | stock | nouveau | tailles`
+
+`prix` et `stock` sont numériques. `image` est une URL publique (pas un fichier
+envoyé). `tailles` contient des valeurs séparées par des virgules. La disponibilité
+est calculée côté serveur : `stock > 0` donne `en_stock`, sinon `epuise`.
+
+### Déploiement et mot de passe admin
+
+1. Collez **la totalité** de `google-apps-script.js` dans Apps Script, puis
+   déployez-le comme **Application Web**, exécuté en tant que vous et accessible
+   à « Tout le monde ». Redéployez après chaque modification du script.
+2. Dans Apps Script, ouvrez **Paramètres du projet → Propriétés du script** et
+   ajoutez `ADMIN_PASSWORD` avec un mot de passe long et unique. Le mot de passe
+   est stocké côté serveur, jamais dans `admin.html`.
+3. Dans `script.js`, renseignez `catalogueEndpointUrl` avec l'URL `/exec`.
+   Dans `admin.html`, renseignez également `ENDPOINT` avec cette même URL.
+4. Ouvrez `/admin.html` pour vous connecter. La page appelle les actions serveur
+   `login`, `list`, `save` et `delete`; une protection frontend seule ne serait
+   pas une sécurité suffisante.
+
+La boutique demande `?action=list` à l'endpoint. En cas d'indisponibilité ou
+d'URL non configurée, elle conserve automatiquement le repli sur `products.json`.
+Ne modifiez pas `googleSheetWebAppUrl` : il reste utilisé pour enregistrer les
+commandes et les notifications e-mail existantes.
+
 Google Sheets fonctionne ici comme un second canal indépendant de Netlify Forms. Le site envoie la commande à Netlify pour l'e-mail et, séparément, à votre application Web Google Apps Script pour l'enregistrement dans le tableau.
 
 ## 1. Créer le Google Sheet
