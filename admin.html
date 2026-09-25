@@ -36,7 +36,7 @@
       </section>
       <form id="product-form" class="panel hidden">
         <h2 id="form-title">Produit</h2><div class="grid">
-          <label>Nom *<input name="nom" required></label><label>Catégorie *<input name="categorie" required></label>
+          <label>Nom *<input name="nom" required></label><label>Catégorie *<select name="categorie" required><option value="" disabled selected>Choisir une catégorie</option><option value="accessoires">Accessoires</option><option value="parfums">Parfums</option><option value="vetements">Vêtements</option><option value="autres">Autres</option></select></label>
           <label>Prix (FCFA) *<input name="prix" type="number" min="0" required></label><label>Stock *<input name="stock" type="number" min="0" required></label>
           <label class="wide">Description<textarea name="description" rows="3"></textarea></label><input name="image" type="hidden">
           <label>Tailles (séparées par virgule)<input name="tailles"></label><label><span>Nouveau</span><input name="nouveau" type="checkbox"></label>
