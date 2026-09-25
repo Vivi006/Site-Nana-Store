@@ -49,79 +49,19 @@ La colonne **Statut commande** est volontairement laissée à votre équipe. Uti
 
 1. Dans le Sheet, allez dans **Extensions → Apps Script**.
 2. Supprimez le contenu de `Code.gs`.
-3. Collez ce code complet :
+3. Ouvrez [google-apps-script.js](./google-apps-script.js) dans ce projet.
+4. Copiez **la totalité du fichier** et collez-la dans `Code.gs`.
+5. Cliquez sur **Enregistrer**.
 
-```javascript
-const NOM_FEUILLE = "Feuille 1";
-const NOTIFICATION_EMAILS = [
-  "votre-email-interne@example.com",
-  // "email-de-votre-associee@example.com",
-];
+N'utilisez pas l'ancien bloc de code de commande qui figurait précédemment dans ce guide. Le fichier complet actuel gère ensemble :
 
-function doPost(e) {
-  try {
-    if (!e || !e.postData || !e.postData.contents) {
-      throw new Error("Aucune donnée JSON reçue.");
-    }
+- l'enregistrement des commandes dans l'onglet `Commandes` ;
+- les notifications e-mail aux administrateurs ;
+- la confirmation e-mail au client ;
+- le catalogue dans l'onglet `Produits` ;
+- les actions de l'interface `admin.html`.
 
-    const commande = JSON.parse(e.postData.contents);
-    const feuille = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOM_FEUILLE);
-
-    if (!feuille) {
-      throw new Error(`La feuille "${NOM_FEUILLE}" est introuvable.`);
-    }
-
-    feuille.appendRow([
-      commande.date || new Date().toISOString(),
-      commande.numero_commande || "",
-      commande.nom_client || "",
-      commande.telephone || "",
-      commande.commune || "",
-      commande.adresse || "",
-      commande.recapitulatif_commande || "",
-      commande.total || 0,
-      commande.mode_paiement || "",
-      commande.statut_paiement || "",
-      commande.note_livraison || "",
-      "Nouvelle"
-    ]);
-
-    if (NOTIFICATION_EMAILS.length) {
-      MailApp.sendEmail({
-        to: NOTIFICATION_EMAILS.join(","),
-        subject: `Nouvelle commande Nana Store - ${commande.numero_commande || "sans numéro"}`,
-        body: [
-          `Commande : ${commande.numero_commande || ""}`,
-          `Client : ${commande.nom_client || ""}`,
-          `Téléphone : ${commande.telephone || ""}`,
-          `Commune : ${commande.commune || ""}`,
-          `Adresse : ${commande.adresse || ""}`,
-          "",
-          commande.recapitulatif_commande || "",
-          "",
-          `Total : ${commande.total || 0} FCFA`,
-          `Paiement : ${commande.mode_paiement || ""}`,
-          `Statut paiement : ${commande.statut_paiement || ""}`,
-          `Livraison : ${commande.note_livraison || ""}`
-        ].join("\n")
-      });
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (erreur) {
-    console.error(erreur);
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, erreur: erreur.message }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-```
-
-Si votre onglet porte un autre nom, remplacez `Feuille 1` dans `NOM_FEUILLE` par le nom exact de l'onglet.
-
-4. Cliquez sur **Enregistrer**.
+Les deux fonctions restent séparées : une commande normale est enregistrée dans `Commandes`, tandis que les requêtes de l'administration utilisent `Produits`.
 
 ## 3. Déployer l'application Web
 
