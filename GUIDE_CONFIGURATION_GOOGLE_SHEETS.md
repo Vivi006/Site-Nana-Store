@@ -8,8 +8,9 @@ avec ces colonnes, dans cet ordre :
 
 `id | nom | categorie | prix | description | image | stock | nouveau | tailles`
 
-`prix` et `stock` sont numériques. `image` est une URL publique (pas un fichier
-envoyé). `tailles` contient des valeurs séparées par des virgules. La disponibilité
+`prix` et `stock` sont numériques. `image` conserve les images déjà associées aux
+produits existants ; l'interface simple ne demande pas d'URL pour les nouveaux
+produits. `tailles` contient des valeurs séparées par des virgules. La disponibilité
 est calculée côté serveur : `stock > 0` donne `en_stock`, sinon `epuise`.
 
 ### Déploiement et mot de passe admin
