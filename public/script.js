@@ -1029,7 +1029,7 @@ function closeCheckoutModal() {
 
 // URL Google Apps Script Web App pour la synchronisation Google Sheets & Alertes Email
 // Suivez le guide dans GUIDE_CONFIGURATION_GOOGLE_SHEETS.md pour obtenir votre URL
-const GOOGLE_SHEET_WEBAPP_URL = "";
+const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec";
 
 /**
  * Soumission du formulaire de commande (Google Sheets + Netlify Forms + WhatsApp + Ivoire Livraison)

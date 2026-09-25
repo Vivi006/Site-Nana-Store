@@ -1,8 +1,8 @@
 /* Toutes les informations à personnaliser sont regroupées ici. */
 const CONFIG = {
   nom: "Nana Store",
-  googleSheetWebAppUrl: "[URL_DU_SCRIPT_APPS_SCRIPT]",
-  catalogueEndpointUrl: "[URL_DU_SCRIPT_APPS_SCRIPT]",
+  googleSheetWebAppUrl: "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec",
+  catalogueEndpointUrl: "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec",
   // Remplissez une fiche par associée. La première reçoit les liens WhatsApp principaux.
   collaboratrices: [
     { nom: "Associé 1", whatsapp: "+225 05 45 15 31 93" },

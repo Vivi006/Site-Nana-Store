@@ -38,7 +38,7 @@
     </section>
   </main>
   <script>
-    const ENDPOINT = "[URL_DU_SCRIPT_APPS_SCRIPT]";
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzcmKZ0jxH8IHyIMWiJLN6KVdCQ-u1AGQpTSqmQKFMswaH3JJsPbUrAbRxfxw8l3MAm4A/exec";
     const state = {token: sessionStorage.getItem("nana-admin-token") || "", products: [], editing: null};
     const $ = (s) => document.querySelector(s);
     async function call(action, extra = {}) {
