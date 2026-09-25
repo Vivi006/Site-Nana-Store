@@ -8,8 +8,8 @@ avec ces colonnes, dans cet ordre :
 
 `id | nom | categorie | prix | description | image | stock | nouveau | tailles`
 
-`prix` et `stock` sont numériques. `image` est une URL publique (l'interface peut
-générer une URL Google Drive). `tailles` contient des valeurs séparées par des virgules. La disponibilité
+`prix` et `stock` sont numériques. `image` est une URL publique (pas un fichier
+envoyé). `tailles` contient des valeurs séparées par des virgules. La disponibilité
 est calculée côté serveur : `stock > 0` donne `en_stock`, sinon `epuise`.
 
 ### Déploiement et mot de passe admin
@@ -25,36 +25,6 @@ est calculée côté serveur : `stock > 0` donne `en_stock`, sinon `epuise`.
 4. Ouvrez `/admin.html` pour vous connecter. La page appelle les actions serveur
    `login`, `list`, `save` et `delete`; une protection frontend seule ne serait
    pas une sécurité suffisante.
-
-### Images produit dans Google Drive
-
-L'interface `/admin.html` propose aussi une galerie d'images. Les actions
-`listImages`, `uploadImage` et `deleteImage` exigent le même token de session
-administrateur. Les téléversements sont limités à 5 Mo et aux formats JPEG,
-PNG, GIF, WebP et AVIF.
-
-1. Dans **Paramètres du projet → Propriétés du script**, vous pouvez ajouter
-   `PRODUCT_IMAGES_FOLDER_ID` avec l'identifiant d'un dossier Drive existant.
-   Le compte qui exécute le déploiement doit pouvoir y écrire.
-2. Si cette propriété est absente, le premier chargement de la galerie crée
-   automatiquement **Nana Store - Images** à la racine de votre Drive, enregistre
-   son identifiant dans la propriété et l'affiche clairement dans l'interface.
-   Vous pouvez ensuite remplacer la propriété par l'ID d'un autre dossier si
-   nécessaire.
-3. Connectez-vous à `/admin.html`, sélectionnez un fichier local (5 Mo maximum),
-   puis cliquez sur **Téléverser**. Google Drive rend le fichier lisible par
-   lien et la galerie permet de le **Choisir** pour renseigner automatiquement
-   l'URL du champ image du produit. **Supprimer** demande confirmation et place
-   le fichier à la corbeille Drive.
-4. Pour migrer les images historiques du dépôt une seule fois, ouvrez le
-   dossier d'images (`images/`), téléversez ses fichiers dans le dossier Drive
-   configuré (glisser-déposer dans Drive ou via la galerie), puis choisissez
-   chaque image dans l'administration et enregistrez le produit. Les anciennes
-   URLs `images/...` restent valides : aucune migration n'est obligatoire.
-
-Les fichiers Drive sont configurés « accessible à toute personne disposant du
-lien » afin que la boutique publique puisse afficher les URLs retournées.
-N'utilisez pas ce dossier pour des documents confidentiels.
 
 La boutique demande `?action=list` à l'endpoint. En cas d'indisponibilité ou
 d'URL non configurée, elle conserve automatiquement le repli sur `products.json`.
